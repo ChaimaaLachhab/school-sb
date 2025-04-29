@@ -1,1 +1,82 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import "primeicons/primeicons.css";
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  list-style: none;
+}
+
+::selection{
+  background: black;
+  color: white;
+}
+:root {
+  --primary-color: #fff;
+  --background-color: #F3F6FD;
+  --text-color: #000;
+  --color-border:black;
+  --color-primary :#FFD900;
+  --color-secondary :#6844CC ;
+  --bg-primary: #F6F3EF;
+  --color-light: #FFF;
+  --color-link : #0A5CDF;
+  --border-raduis-pr : 25px;
+  --bg-header:#00000030;
+  --bg-service:#fff;
+  --color-border:#6c6c6c;
+  --hover-color:#fff;
+  --hover-bg:#1F2937;
+  --tb-color:#6c757d;
+  --tb-color-hover:#d8e0e7;
+  --logo:url("./assets/images/black.png");
+  --case-default :url("./assets/images/cas1.png");
+}
+::-webkit-scrollbar {
+  width: 3px;
+  height:3px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-border);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: black;
+}
+
+.dark-theme {
+  --primary-color: #111827;
+  --background-color: #1F2937;
+  --hover-color:#111827;
+  --hover-bg:#F3F6FD;
+  --text-color: #fff;
+  --color-border:#6c6c6c;
+  --bg-header:#00000030;
+  --gradient-color : linear-gradient(360deg , var(--background-color) , rgba(0, 0, 0, 0.023));
+  --bg-service: url("./assets/images/dfsdfdf-min.jpg") no-repeat top right/cover;
+  --tb-color:#d8e0e7;
+  --tb-color-hover:#393f43;
+  --logo:url("./assets/images/white.png");
+  --case-default :url("./assets/images/cas2.png");
+}
+
+body {
+  color: var(--text-color);
+  background-color: var(--background-color);
+  width: 100%;
+  height: 100vh;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+

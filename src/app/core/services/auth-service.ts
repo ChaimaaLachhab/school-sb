@@ -5,9 +5,9 @@ import { tap } from 'rxjs/operators';
 import { environment } from "../../../environments/environment";
 import { JwtService } from "./jwt.service";
 import { Router } from "@angular/router";
-import { Role } from "../enums/role.enum";
-import {LoginRequest} from "../dto/login-request";
-import {JwtResponse} from "../dto/jwt-response";
+import { Role } from "../enums/Role";
+import { LoginRequest } from "../dto/login-request";
+import { JwtResponse } from "../dto/jwt-response";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ import {JwtResponse} from "../dto/jwt-response";
 export class AuthService {
 
   private apiUrl = `${environment.apiUrl}/auth`;
-  private currentUserSubject = new BehaviorSubject<any>(this.decodeToken(this.jwtService.getToken()));
+  currentUserSubject = new BehaviorSubject<any>(this.decodeToken(this.jwtService.getToken()));
 
   currentUser$ = this.currentUserSubject.asObservable();
 
@@ -30,7 +30,14 @@ export class AuthService {
       tap((response: JwtResponse) => {
         if (response) {
           this.jwtService.saveToken(response.token);
-          this.currentUserSubject.next(this.decodeToken(response.token));
+          const decoded = this.decodeToken(response.token);
+          this.currentUserSubject.next(decoded);
+
+          // Si le premier rôle existe, le stocker dans localStorage
+          if (decoded && decoded.roles && decoded.roles.length > 0) {
+            const roleWithoutPrefix = this.normalizeRole(decoded.roles[0]);
+            this.jwtService.setUserRole(roleWithoutPrefix);
+          }
         } else {
           console.error('No login response received');
         }
@@ -64,17 +71,44 @@ export class AuthService {
     return !!this.currentUserSubject.value;
   }
 
-  hasRole(role: Role): boolean {
-    const currentUserRole = this.getCurrentUserRole();
-    return currentUserRole === role;
+  /**
+   * Normalize un rôle en enlevant le préfixe "ROLE_" si présent
+   */
+  private normalizeRole(role: string): string {
+    return role.startsWith('ROLE_') ? role.substring(5) : role;
   }
 
-  getCurrentUserRole(): Role | null {
-    const token = this.jwtService.getToken();
-    if (token) {
-      return this.jwtService.getUserRole(token) as Role || null;
+  /**
+   * Vérifie si l'utilisateur a un rôle spécifique
+   * Gère à la fois les rôles avec et sans préfixe "ROLE_"
+   */
+  hasRole(role: Role): boolean {
+    const currentUser = this.currentUserSubject.value;
+    if (!currentUser || !currentUser.roles) {
+      return false;
     }
-    return null;
+
+    // Normaliser le rôle recherché
+    const normalizedTargetRole = this.normalizeRole(role.toString());
+
+    // Vérifier les rôles de l'utilisateur (en normalisant chacun)
+    return currentUser.roles.some((userRole: string) => {
+      const normalizedUserRole = this.normalizeRole(userRole);
+      return normalizedUserRole === normalizedTargetRole;
+    });
+  }
+
+  /**
+   * Récupère le rôle actuel de l'utilisateur sans le préfixe "ROLE_"
+   */
+  getCurrentUserRole(): Role | null {
+    const currentUser = this.currentUserSubject.value;
+    if (!currentUser || !currentUser.roles || currentUser.roles.length === 0) {
+      return null;
+    }
+
+    // Prendre le premier rôle et enlever le préfixe "ROLE_" si présent
+    return this.normalizeRole(currentUser.roles[0]) as Role;
   }
 
   private decodeToken(token: string | null): any {

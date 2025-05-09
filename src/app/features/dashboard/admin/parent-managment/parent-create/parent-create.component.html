@@ -1,0 +1,133 @@
+<div class="container">
+  <h1>Ajouter un Parent</h1>
+
+  <form [formGroup]="formParent" (ngSubmit)="insert()">
+    <div class="form-group">
+      <label for="nom">Nom:</label>
+      <input
+        type="text"
+        id="nom"
+        class="form-control"
+        formControlName="nom"
+        placeholder="Entrez le nom du parent"
+      />
+      <div *ngIf="formParent.get('nom')?.invalid && formParent.get('nom')?.touched" class="error-message">
+        Le nom est requis
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="prenom">Prénom:</label>
+      <input
+        type="text"
+        id="prenom"
+        class="form-control"
+        formControlName="prenom"
+        placeholder="Entrez le prénom du parent"
+      />
+      <div *ngIf="formParent.get('prenom')?.invalid && formParent.get('prenom')?.touched" class="error-message">
+        Le prénom est requis
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        class="form-control"
+        formControlName="email"
+        placeholder="Entrez l'email du parent"
+      />
+      <div *ngIf="formParent.get('email')?.invalid && formParent.get('email')?.touched" class="error-message">
+        Un email valide est requis
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="telephone">Téléphone:</label>
+      <input
+        type="text"
+        id="telephone"
+        class="form-control"
+        formControlName="telephone"
+        placeholder="Entrez le numéro de téléphone"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="sexe">Sexe:</label>
+      <select
+        id="sexe"
+        class="form-control"
+        formControlName="sexe"
+      >
+        <option *ngFor="let sexe of sexeOptions" [value]="sexe">
+          {{ sexe === 'MASCULIN' ? 'Masculin' : 'Féminin' }}
+        </option>
+      </select>
+      <div *ngIf="formParent.get('sexe')?.invalid && formParent.get('sexe')?.touched" class="error-message">
+        Le sexe est requis
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Nom d'utilisateur:</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control"
+        formControlName="username"
+        placeholder="Entrez le nom d'utilisateur"
+      />
+      <div *ngIf="formParent.get('username')?.invalid && formParent.get('username')?.touched" class="error-message">
+        Le nom d'utilisateur est requis
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Mot de passe:</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        formControlName="password"
+        placeholder="Entrez le mot de passe"
+      />
+      <div *ngIf="formParent.get('password')?.invalid && formParent.get('password')?.touched" class="error-message">
+        Le mot de passe est requis (6 caractères minimum)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="relationAvecEtudiant">Relation avec l'étudiant:</label>
+      <input
+        type="text"
+        id="relationAvecEtudiant"
+        class="form-control"
+        formControlName="relationAvecEtudiant"
+        placeholder="Ex: Père, Mère, Tuteur..."
+      />
+      <div *ngIf="formParent.get('relationAvecEtudiant')?.invalid && formParent.get('relationAvecEtudiant')?.touched" class="error-message">
+        La relation avec l'étudiant est requise
+      </div>
+    </div>
+
+    <!-- Note: Dans une application réelle, vous auriez probablement un sélecteur d'étudiants ici -->
+    <div class="form-group">
+      <label for="enfantsIds">ID des enfants (à remplacer par un sélecteur):</label>
+      <input
+        type="text"
+        id="enfantsIds"
+        class="form-control"
+        placeholder="IDs des étudiants associés"
+        disabled
+      />
+      <small class="form-text text-muted">Cette partie nécessiterait un sélecteur d'étudiants réel.</small>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" [disabled]="formParent.invalid">Ajouter</button>
+    </div>
+  </form>
+</div>

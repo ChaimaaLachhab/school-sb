@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import {FormGroup, FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import {AuthService} from "../../../../core/services/auth-service";
-import {LoginRequest} from "../../../../core/dto/login-request";
-import {Role} from "../../../../core/enums/role.enum";
+import { AuthService } from "../../../../core/services/auth-service";
+import { LoginRequest } from "../../../../core/dto/login-request";
+import { Role } from "../../../../core/enums/Role";
+import { NgIf } from "@angular/common";
 
 @Component({
   selector: 'app-section-login',
   templateUrl: './section-login.component.html',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   styleUrls: ['./section-login.component.css']
 })
-export class SectionLoginComponent implements OnInit{
+export class SectionLoginComponent implements OnInit {
   formLogin!: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -45,30 +47,35 @@ export class SectionLoginComponent implements OnInit{
       this.isLoading = true;
       this.authService.login(request).subscribe(
         (res) => {
-          localStorage.setItem('jwtData', JSON.stringify(res));
           const decodedToken: any = jwtDecode(res.token);
           console.log('Decoded Token:', decodedToken);
 
-          if (decodedToken.roles.includes(Role[Role.ENSEIGNANT])) {
-            this.router.navigateByUrl('prof-dashboard');
-          } else if (decodedToken.roles.includes(Role[Role.ETUDIANT])) {
-            this.router.navigateByUrl('eleve-dashboard');
-          } else if (decodedToken.roles.includes(Role[Role.ADMIN])) {
-            this.router.navigateByUrl('admin-dashboard');
+          const roles: string[] = decodedToken.roles;
+          console.log('Decoded Roles:', roles);
+
+          // Corriger la vérification des rôles en tenant compte du préfixe 'ROLE_'
+          if (roles.includes('ROLE_' + Role.ADMIN) || roles.includes(Role.ADMIN)) {
+            this.router.navigateByUrl('/dashboard/admin');
+          } else if (roles.includes('ROLE_' + Role.ENSEIGNANT) || roles.includes(Role.ENSEIGNANT)) {
+            this.router.navigateByUrl('/dashboard/enseignant');
+          } else if (roles.includes('ROLE_' + Role.ETUDIANT) || roles.includes(Role.ETUDIANT)) {
+            this.router.navigateByUrl('/dashboard/etudiant');
+          } else if (roles.includes('ROLE_' + Role.PARENT) || roles.includes(Role.PARENT)) {
+            this.router.navigateByUrl('/dashboard/parent');
           } else {
-            this.errorMessage = 'Unauthorized role, please try again!';
+            this.errorMessage = 'Rôle non autorisé, veuillez réessayer!';
           }
+
           this.isLoading = false;
           this.ngOnInit();
         },
         (error) => {
-          this.errorMessage = 'Login failed. Please check your credentials.';
+          this.errorMessage = 'Échec de connexion. Veuillez vérifier vos identifiants.';
           this.isLoading = false;
         }
       );
     } else {
-      this.errorMessage = 'Form is invalid. Please fill out all required fields.';
+      this.errorMessage = 'Le formulaire est invalide. Veuillez remplir tous les champs requis.';
     }
   }
-
 }

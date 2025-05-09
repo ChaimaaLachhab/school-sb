@@ -1,0 +1,62 @@
+<div class="main">
+  <div class="menu"></div>
+
+  <ul>
+    <li>
+      <a
+        routerLink="/dashboard/admin"
+        (click)="setActiveLink('/dashboard/admin')"
+        [ngClass]="{
+             'active': isLinkActive('/dashboard/admin')
+           }">
+        <i class="pi pi-home"></i>
+        <p [ngClass]="{'active-p': isLinkActive('/dashboard/admin')}">Home</p>
+      </a>
+    </li>
+    <li>
+      <a
+        routerLink="/dashboard/admin/gestion-profs"
+        (click)="setActiveLink('/dashboard/admin/gestion-profs')"
+        [ngClass]="{
+             'active': isLinkActive('/dashboard/admin/gestion-profs')
+           }">
+        <i class="pi pi-chart-pie"></i>
+        <p [ngClass]="{'active-p': isLinkActive('/dashboard/admin/gestion-profs')}">Gestion Profs</p>
+      </a>
+    </li>
+    <li>
+      <a
+        routerLink="/dashboard/admin/classe"
+        (click)="setActiveLink('/dashboard/admin/classe')"
+        [ngClass]="{
+             'active': isLinkActive('/dashboard/admin/classe')
+           }">
+        <i class="pi pi-objects-column"></i>
+        <p [ngClass]="{'active-p': isLinkActive('/dashboard/admin/classe')}">Classe</p>
+      </a>
+    </li>
+    <li>
+      <a
+        routerLink="/dashboard/admin/absence"
+        (click)="setActiveLink('/dashboard/admin/absence')"
+        [ngClass]="{
+             'active': isLinkActive('/dashboard/admin/absence')
+           }">
+        <i class="pi pi-calendar"></i>
+        <p [ngClass]="{'active-p': isLinkActive('/dashboard/admin/absence')}">absence</p>
+      </a>
+    </li>
+
+    <li>
+      <a
+        routerLink="/dashboard/admin/exam"
+        (click)="setActiveLink('/dashboard/admin/exam')"
+        [ngClass]="{
+             'active': isLinkActive('/dashboard/admin/exam')
+           }">
+        <i class="pi pi-clipboard"></i>
+        <p [ngClass]="{'active-p': isLinkActive('/dashboard/admin/exam')}">Exmes</p>
+      </a>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,51 @@
+.container{
+    padding: 20px;
+    background: var(--background-color);
+    border-radius: 15px;
+}
+.container > h1{
+    font-size: 20px;
+    padding: 10px;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+form{
+    width: 100%;
+    /* display: flex;
+    align-items: start;
+    justify-content: left;
+    flex-wrap: wrap; */
+}
+.group{
+    width: 100%;
+    display: flex;
+}
+.form-group{
+    width: 99%;
+    margin-right: 5px;
+}
+.form-group > input , select {
+    width: 100%;
+    background: var(--primary-color);
+    color: var(--text-color);
+}
+.form-group > input::placeholder{
+    color: var(--color-border);
+}
+label{
+    font-size: 16px;
+    font-weight: 500;
+    padding: 5px;
+}
+.form-group > button{
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--hover-bg);
+    background: var(--background-color);
+    color: var(--text-color);
+    transition: .4s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}

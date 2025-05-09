@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth-service';
-import { Role } from "../enums/role.enum";
+import { Role } from "../enums/Role";
 
 export const roleGuard = (allowedRoles: Role[]): CanActivateFn => {
   return (_route, state) => {

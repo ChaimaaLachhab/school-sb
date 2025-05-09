@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: end;
-  background: url(../../../../assets/images/bg1.png) no-repeat bottom right/cover;
+  background: url('https://www.pewtrusts.org/-/media/post-launch-images/2019/10/gettyimages940682582jpgmaster/16x9_m.jpg') no-repeat bottom right/cover;
 }
 .main-wrapper{
   width: 100%;
@@ -223,9 +223,5 @@
 
 .sign-in{
   width: 80%;
-  height: 90%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 

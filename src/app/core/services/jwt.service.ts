@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
-import {Role} from "../enums/role.enum";
+import { Role } from "../enums/Role";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,11 @@ export class JwtService {
 
   getUserRole(token: string): string | null {
     const decodedToken = this.decodeToken(token);
-    return decodedToken?.role || null;
+    if (decodedToken?.roles && decodedToken.roles.length > 0) {
+      const role = decodedToken.roles[0];
+      return role.startsWith('ROLE_') ? role.substring(5) : role;
+    }
+    return null;
   }
 
   saveToken(token: string): void {

@@ -6,7 +6,7 @@
         <div class="header-section">
           <button class="add-button" (click)="openModal()">Ajouter un module</button>
         </div>
-        <app-classroom-list></app-classroom-list>
+        <app-module-list></app-module-list>
       </div>
     </div>
   </div>
@@ -19,7 +19,7 @@
       <span class="close-button" (click)="closeModal()">&times;</span>
     </div>
     <div class="modal-body">
-      <app-classroom-create (classCreated)="onClassCreated()"></app-classroom-create>
+      <app-module-create (moduleCreated)="onModuleCreated()"></app-module-create>
     </div>
   </div>
 </div>

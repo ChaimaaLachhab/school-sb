@@ -4,32 +4,33 @@ import { environment } from "../../../environments/environment";
 import { Observable } from 'rxjs';
 import { ClasseRequest } from '../dto/classe/classe-request';
 import { ClasseResponse } from '../dto/classe/classe-response';
+import { ApiResponse } from "../dto/common/api-response";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClasseService {
-  private apiUrl = `${environment.apiUrl}/auth/classes`;
+  private apiUrl = `${environment.apiUrl}/classes`;
 
   constructor(private http: HttpClient) {}
 
-  getAllClasses(): Observable<ClasseResponse[]> {
-    return this.http.get<ClasseResponse[]>(`${this.apiUrl}`);
+  getAllClasses(): Observable<ApiResponse<ClasseResponse[]>> {
+    return this.http.get<ApiResponse<ClasseResponse[]>>(`${this.apiUrl}`);
   }
 
-  getClasseById(id: number): Observable<ClasseResponse> {
-    return this.http.get<ClasseResponse>(`${this.apiUrl}/${id}`);
+  getClasseById(id: number): Observable<ApiResponse<ClasseResponse>> {
+    return this.http.get<ApiResponse<ClasseResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  createClasse(request: ClasseRequest): Observable<ClasseResponse> {
-    return this.http.post<ClasseResponse>(`${this.apiUrl}`, request);
+  createClasse(request: ClasseRequest): Observable<ApiResponse<ClasseResponse>> {
+    return this.http.post<ApiResponse<ClasseResponse>>(`${this.apiUrl}`, request);
   }
 
-  updateClasse(id: number, request: ClasseRequest): Observable<ClasseResponse> {
-    return this.http.put<ClasseResponse>(`${this.apiUrl}/${id}`, request);
+  updateClasse(id: number, request: ClasseRequest): Observable<ApiResponse<ClasseResponse>> {
+    return this.http.put<ApiResponse<ClasseResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
-  deleteClasse(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteClasse(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 }

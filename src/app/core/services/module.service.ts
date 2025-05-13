@@ -6,56 +6,57 @@ import { ModuleRequest } from '../dto/module/module-request';
 import { ModuleResponse } from '../dto/module/module-response';
 import { ClasseResponse } from '../dto/classe/classe-response';
 import { SessionResponse } from '../dto/session/session-response';
+import { ApiResponse } from '../dto/common/api-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModuleService {
-  private apiUrl = `${environment.apiUrl}/auth/modules`;
+  private apiUrl = `${environment.apiUrl}/modules`;
 
   constructor(private http: HttpClient) {}
 
-  getAllModules(): Observable<ModuleResponse[]> {
-    return this.http.get<ModuleResponse[]>(`${this.apiUrl}`);
+  getAllModules(): Observable<ApiResponse<ModuleResponse[]>> {
+    return this.http.get<ApiResponse<ModuleResponse[]>>(`${this.apiUrl}`);
   }
 
-  getModuleById(id: number): Observable<ModuleResponse> {
-    return this.http.get<ModuleResponse>(`${this.apiUrl}/${id}`);
+  getModuleById(id: number): Observable<ApiResponse<ModuleResponse>> {
+    return this.http.get<ApiResponse<ModuleResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  getModulesByClasse(classeId: number): Observable<ModuleResponse[]> {
-    return this.http.get<ModuleResponse[]>(`${this.apiUrl}/classe/${classeId}`);
+  getModulesByClasse(classeId: number): Observable<ApiResponse<ModuleResponse[]>> {
+    return this.http.get<ApiResponse<ModuleResponse[]>>(`${this.apiUrl}/classe/${classeId}`);
   }
 
-  getModulesByEnseignant(enseignantId: number): Observable<ModuleResponse[]> {
-    return this.http.get<ModuleResponse[]>(`${this.apiUrl}/enseignant/${enseignantId}`);
+  getModulesByEnseignant(enseignantId: number): Observable<ApiResponse<ModuleResponse[]>> {
+    return this.http.get<ApiResponse<ModuleResponse[]>>(`${this.apiUrl}/enseignant/${enseignantId}`);
   }
 
-  createModule(module: ModuleRequest): Observable<ModuleResponse> {
-    return this.http.post<ModuleResponse>(`${this.apiUrl}`, module);
+  createModule(module: ModuleRequest): Observable<ApiResponse<ModuleResponse>> {
+    return this.http.post<ApiResponse<ModuleResponse>>(`${this.apiUrl}`, module);
   }
 
-  updateModule(id: number, module: ModuleRequest): Observable<ModuleResponse> {
-    return this.http.put<ModuleResponse>(`${this.apiUrl}/${id}`, module);
+  updateModule(id: number, module: ModuleRequest): Observable<ApiResponse<ModuleResponse>> {
+    return this.http.put<ApiResponse<ModuleResponse>>(`${this.apiUrl}/${id}`, module);
   }
 
-  deleteModule(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteModule(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  activerModule(id: number, actif: boolean): Observable<ModuleResponse> {
-    return this.http.patch<ModuleResponse>(`${this.apiUrl}/${id}/activation`, { actif });
+  activerModule(id: number, actif: boolean): Observable<ApiResponse<ModuleResponse>> {
+    return this.http.patch<ApiResponse<ModuleResponse>>(`${this.apiUrl}/${id}/activation`, { actif });
   }
 
-  getModulesBySessionAndEnseignant(sessionId: number, enseignantId: number): Observable<ModuleResponse[]> {
-    return this.http.get<ModuleResponse[]>(`${this.apiUrl}/session/${sessionId}/enseignant/${enseignantId}`);
+  getModulesBySessionAndEnseignant(sessionId: number, enseignantId: number): Observable<ApiResponse<ModuleResponse[]>> {
+    return this.http.get<ApiResponse<ModuleResponse[]>>(`${this.apiUrl}/session/${sessionId}/enseignant/${enseignantId}`);
   }
 
-  getClassesByModuleAndEnseignant(moduleId: number, enseignantId: number): Observable<ClasseResponse[]> {
-    return this.http.get<ClasseResponse[]>(`${this.apiUrl}/${moduleId}/enseignant/${enseignantId}/classes`);
+  getClassesByModuleAndEnseignant(moduleId: number, enseignantId: number): Observable<ApiResponse<ClasseResponse[]>> {
+    return this.http.get<ApiResponse<ClasseResponse[]>>(`${this.apiUrl}/${moduleId}/enseignant/${enseignantId}/classes`);
   }
 
-  getSessionsByEnseignant(enseignantId: number): Observable<SessionResponse[]> {
-    return this.http.get<SessionResponse[]>(`${this.apiUrl}/enseignant/${enseignantId}/sessions`);
+  getSessionsByEnseignant(enseignantId: number): Observable<ApiResponse<SessionResponse[]>> {
+    return this.http.get<ApiResponse<SessionResponse[]>>(`${this.apiUrl}/enseignant/${enseignantId}/sessions`);
   }
 }

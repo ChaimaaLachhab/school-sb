@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgForOf } from "@angular/common";
-import { formatDate } from '@angular/common';
-import {ClasseResponse} from "../../../../../core/dto/classe/classe-response";
-import {EtudiantService} from "../../../../../core/services/etudiant.service";
-import {ClasseService} from "../../../../../core/services/classe.service";
-import {EtudiantRequest} from "../../../../../core/dto/etudiant/etudiant-request";
-import {Role} from "../../../../../core/enums/Role";
+import { NgForOf, CommonModule } from "@angular/common";
+import { ClasseResponse } from "../../../../../core/dto/classe/classe-response";
+import { EtudiantService } from "../../../../../core/services/etudiant.service";
+import { ClasseService } from "../../../../../core/services/classe.service";
+import { EtudiantRequest } from "../../../../../core/dto/etudiant/etudiant-request";
+import { Role } from "../../../../../core/enums/Role";
 
 @Component({
   selector: 'app-student-create',
@@ -14,119 +13,18 @@ import {Role} from "../../../../../core/enums/Role";
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    CommonModule,
     NgForOf
   ],
   styleUrls: ['./student-create.component.css']
 })
 export class StudentCreateComponent implements OnInit {
+  @Output() studentCreated = new EventEmitter<void>();
+
   FormEleve!: FormGroup;
-  ListClasses!: ClasseResponse[];
+  ListClasses: ClasseResponse[] = [];
 
-  // Exemple de données pour remplir le tableau ListClasses
-  ListClasse = [
-    {
-      id: 1,
-      nom: "Première A",
-      niveauId: 3,
-      anneeScolaire: "2024-2025",
-      capacite: 30,
-      actif: true,
-      dateCreation: "2024-08-15T10:30:00",
-      labelNiveau: "Première"
-    },
-    {
-      id: 2,
-      nom: "Seconde B",
-      niveauId: 2,
-      anneeScolaire: "2024-2025",
-      capacite: 28,
-      actif: true,
-      dateCreation: "2024-08-15T11:15:00",
-      labelNiveau: "Seconde"
-    },
-    {
-      id: 3,
-      nom: "Terminale S",
-      niveauId: 4,
-      anneeScolaire: "2024-2025",
-      capacite: 25,
-      actif: true,
-      dateCreation: "2024-08-16T09:45:00",
-      labelNiveau: "Terminale"
-    },
-    {
-      id: 4,
-      nom: "Troisième C",
-      niveauId: 1,
-      anneeScolaire: "2024-2025",
-      capacite: 32,
-      actif: true,
-      dateCreation: "2024-08-16T14:20:00",
-      labelNiveau: "Troisième"
-    },
-    {
-      id: 5,
-      nom: "Seconde A",
-      niveauId: 2,
-      anneeScolaire: "2024-2025",
-      capacite: 29,
-      actif: true,
-      dateCreation: "2024-08-17T08:30:00",
-      labelNiveau: "Seconde"
-    },
-    {
-      id: 6,
-      nom: "Terminale ES",
-      niveauId: 4,
-      anneeScolaire: "2024-2025",
-      capacite: 26,
-      actif: true,
-      dateCreation: "2024-08-17T10:15:00",
-      labelNiveau: "Terminale"
-    },
-    {
-      id: 7,
-      nom: "Première B",
-      niveauId: 3,
-      anneeScolaire: "2024-2025",
-      capacite: 31,
-      actif: true,
-      dateCreation: "2024-08-18T09:00:00",
-      labelNiveau: "Première"
-    },
-    {
-      id: 8,
-      nom: "Troisième A",
-      niveauId: 1,
-      anneeScolaire: "2024-2025",
-      capacite: 30,
-      actif: true,
-      dateCreation: "2024-08-18T13:45:00",
-      labelNiveau: "Troisième"
-    },
-    {
-      id: 9,
-      nom: "Terminale L",
-      niveauId: 4,
-      anneeScolaire: "2024-2025",
-      capacite: 24,
-      actif: true,
-      dateCreation: "2024-08-19T11:30:00",
-      labelNiveau: "Terminale"
-    },
-    {
-      id: 10,
-      nom: "Seconde C",
-      niveauId: 2,
-      anneeScolaire: "2024-2025",
-      capacite: 27,
-      actif: false,
-      dateCreation: "2024-08-20T15:00:00",
-      labelNiveau: "Seconde"
-    }
-  ];
-
-  anneeScolaireCourante: string = new Date().getFullYear().toString();
+  anneeScolaireCourante: string = new Date().getFullYear() + "-" + (new Date().getFullYear() + 1);
 
   constructor(
     private etudiantService: EtudiantService,
@@ -135,13 +33,11 @@ export class StudentCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Chargement des classes
-    this.classeService.getAllClasses().subscribe(data => {
-      this.ListClasses = data;
-      console.log("Classes chargées: " + data.length);
-    });
+    this.initForm();
+    this.loadClasses();
+  }
 
-    // Initialisation du formulaire
+  initForm(): void {
     this.FormEleve = this.fb.group({
       nom: ['', [Validators.required, Validators.minLength(2)]],
       prenom: ['', [Validators.required, Validators.minLength(2)]],
@@ -155,67 +51,124 @@ export class StudentCreateComponent implements OnInit {
       numeroEtudiant: ['', Validators.required],
       filiere: [''],
       classeId: ['', Validators.required],
-      niveauId: ['', Validators.required]
+      niveauId: ['']
+    });
+  }
+
+  loadClasses(): void {
+    this.classeService.getAllClasses().subscribe({
+      next: (response) => {
+        if (response && response.success) {
+          this.ListClasses = response.data;
+          console.log("Classes chargées: " + response.data.length);
+        } else {
+          console.error("Erreur lors du chargement des classes: réponse non valide", response);
+          this.ListClasses = [];
+        }
+      },
+      error: (error) => {
+        console.error("Erreur lors du chargement des classes:", error);
+        this.ListClasses = [];
+      }
     });
   }
 
   addEleve() {
     if (this.FormEleve.valid) {
-      // Création de l'objet EtudiantRequest
-      const newEtudiant: EtudiantRequest = {
-        nom: this.FormEleve.value.nom,
-        prenom: this.FormEleve.value.prenom,
-        email: this.FormEleve.value.email,
-        username: this.FormEleve.value.username,
-        password: this.FormEleve.value.password,
-        telephone: this.FormEleve.value.telephone,
-        dateNaissance: this.FormEleve.value.dateNaissance,
-        adresse: this.FormEleve.value.adresse,
-        sexe: this.FormEleve.value.sexe,
-        role: Role.ETUDIANT,
-        numeroEtudiant: this.FormEleve.value.numeroEtudiant,
-        filiere: this.FormEleve.value.filiere,
-        classeId: this.FormEleve.value.classeId,
-        niveauId: this.FormEleve.value.niveauId,
-        dateInscription: formatDate(new Date(), 'yyyy-MM-dd', 'en-US'),
-        anneeScolaire: this.anneeScolaireCourante
-      };
+      try {
+        // Récupération de la date sélectionnée
+        const dateNaissanceInput = this.FormEleve.value.dateNaissance;
+        const dateNaissance = this.formatDateForBackend(dateNaissanceInput);
 
-      console.log("Étudiant à créer:", newEtudiant);
+        // Date d'inscription (aujourd'hui)
+        const dateInscription = this.formatDateForBackend(new Date().toISOString().split('T')[0]);
 
-      // Envoi de la requête au service
-      this.etudiantService.createEtudiant(newEtudiant).subscribe({
-        next: (response) => {
-          alert("Étudiant créé avec succès!");
-          this.resetForm();
-        },
-        error: (error) => {
-          alert("Erreur lors de la création de l'étudiant: " + error.message);
-          console.error("Erreur:", error);
+        console.log("Date formatée pour l'API:", dateNaissance);
+
+        // Création de l'objet EtudiantRequest
+        const newEtudiant: EtudiantRequest = {
+          nom: this.FormEleve.value.nom,
+          prenom: this.FormEleve.value.prenom,
+          email: this.FormEleve.value.email,
+          username: this.FormEleve.value.username,
+          password: this.FormEleve.value.password,
+          telephone: this.FormEleve.value.telephone || "",
+          dateNaissance: dateNaissance,
+          adresse: this.FormEleve.value.adresse || "",
+          sexe: this.FormEleve.value.sexe,
+          role: Role.ETUDIANT,
+          numeroEtudiant: this.FormEleve.value.numeroEtudiant,
+          filiere: this.FormEleve.value.filiere || "",
+          classeId: Number(this.FormEleve.value.classeId),
+          niveauId: Number(this.FormEleve.value.niveauId),
+          dateInscription: dateInscription,
+          anneeScolaire: this.anneeScolaireCourante,
+          photo: ""
+        };
+
+        console.log("Étudiant à créer:", JSON.stringify(newEtudiant));
+
+        // Envoi de la requête au service
+        this.etudiantService.createEtudiant(newEtudiant).subscribe({
+          next: (response) => {
+            console.log("Réponse de création:", response);
+
+            if (response.success) {
+              alert("Étudiant créé avec succès!");
+              this.resetForm();
+              this.studentCreated.emit();
+            } else {
+              alert("Erreur lors de la création de l'étudiant: " + response.message);
+            }
+          },
+          error: (error) => {
+            console.error("Erreur lors de la création de l'étudiant:", error);
+
+            if (error.status === 401) {
+              alert("Vous n'êtes pas autorisé à effectuer cette action. Veuillez vous reconnecter.");
+            } else if (error.error && error.error.message) {
+              // Analyse détaillée de l'erreur
+              const errorMessage = error.error.message;
+
+              alert("Erreur lors de la création de l'étudiant: " + errorMessage);
+              console.log("Format de date envoyé:", dateNaissance);
+            } else {
+              alert("Erreur lors de la création de l'étudiant: " +
+                (error.message || "Erreur inconnue"));
+            }
+          }
+        });
+      } catch (error: any) {
+        console.error("Erreur lors de la préparation des données:", error);
+        alert("Erreur lors de la préparation des données: " + (error.message || "Erreur inconnue"));
+      }
+    } else {
+      // Afficher les champs invalides
+      const invalidFields: string[] = [];
+      Object.keys(this.FormEleve.controls).forEach(key => {
+        const control = this.FormEleve.get(key);
+        if (control?.invalid) {
+          invalidFields.push(key);
         }
       });
-    } else {
-      alert("Veuillez remplir correctement tous les champs obligatoires.");
+
+      alert(`Veuillez remplir correctement tous les champs obligatoires. Champs invalides: ${invalidFields.join(', ')}`);
     }
   }
 
+  // Méthode pour formater la date selon les besoins du backend
+  private formatDateForBackend(dateString: string): string {
+    // Convertir de YYYY-MM-DD à dd/MM/yyyy
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateString; // Retourner tel quel si le format ne correspond pas
+  }
+
   resetForm() {
-    // Réinitialisation du formulaire
-    this.FormEleve.reset({
-      nom: '',
-      prenom: '',
-      email: '',
-      username: '',
-      password: '',
-      telephone: '',
-      dateNaissance: '',
-      adresse: '',
-      sexe: '',
-      numeroEtudiant: '',
-      filiere: '',
-      classeId: '',
-      niveauId: ''
-    });
+    this.FormEleve.reset();
+    this.initForm();
   }
 
   onClasseChange(event: any) {
@@ -225,6 +178,7 @@ export class StudentCreateComponent implements OnInit {
       this.FormEleve.patchValue({
         niveauId: classe.niveauId
       });
+      console.log(`Classe sélectionnée: ${classe.nom}, niveau ID: ${classe.niveauId}`);
     }
   }
 }

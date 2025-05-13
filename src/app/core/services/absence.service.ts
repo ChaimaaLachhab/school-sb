@@ -5,59 +5,60 @@ import { environment } from '../../../environments/environment';
 import { AbsenceRequest } from '../dto/absence/absence-request';
 import { AbsenceResponse } from '../dto/absence/absence-response';
 import { EtudiantResponse } from '../dto/etudiant/etudiant-response';
+import { ApiResponse } from '../dto/common/api-response';
 
 @Injectable({ providedIn: 'root' })
 export class AbsenceService {
-  private apiUrl = `${environment.apiUrl}/auth/absences`;
+  private apiUrl = `${environment.apiUrl}/absences`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<AbsenceResponse[]> {
-    return this.http.get<AbsenceResponse[]>(this.apiUrl);
+  getAll(): Observable<ApiResponse<AbsenceResponse[]>> {
+    return this.http.get<ApiResponse<AbsenceResponse[]>>(this.apiUrl);
   }
 
-  getById(id: number): Observable<AbsenceResponse> {
-    return this.http.get<AbsenceResponse>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<ApiResponse<AbsenceResponse>> {
+    return this.http.get<ApiResponse<AbsenceResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  getByEtudiant(etudiantId: number): Observable<AbsenceResponse[]> {
-    return this.http.get<AbsenceResponse[]>(`${this.apiUrl}/etudiant/${etudiantId}`);
+  getByEtudiant(etudiantId: number): Observable<ApiResponse<AbsenceResponse[]>> {
+    return this.http.get<ApiResponse<AbsenceResponse[]>>(`${this.apiUrl}/etudiant/${etudiantId}`);
   }
 
-  getBySeance(seanceId: number): Observable<AbsenceResponse[]> {
-    return this.http.get<AbsenceResponse[]>(`${this.apiUrl}/seance/${seanceId}`);
+  getBySeance(seanceId: number): Observable<ApiResponse<AbsenceResponse[]>> {
+    return this.http.get<ApiResponse<AbsenceResponse[]>>(`${this.apiUrl}/seance/${seanceId}`);
   }
 
-  getByEtudiantAndPeriode(etudiantId: number, start: string, end: string): Observable<AbsenceResponse[]> {
-    return this.http.get<AbsenceResponse[]>(`${this.apiUrl}/etudiant/${etudiantId}/periode`, {
+  getByEtudiantAndPeriode(etudiantId: number, start: string, end: string): Observable<ApiResponse<AbsenceResponse[]>> {
+    return this.http.get<ApiResponse<AbsenceResponse[]>>(`${this.apiUrl}/etudiant/${etudiantId}/periode`, {
       params: { dateDebut: start, dateFin: end }
     });
   }
 
-  create(data: AbsenceRequest): Observable<AbsenceResponse> {
-    return this.http.post<AbsenceResponse>(this.apiUrl, data);
+  create(data: AbsenceRequest): Observable<ApiResponse<AbsenceResponse>> {
+    return this.http.post<ApiResponse<AbsenceResponse>>(this.apiUrl, data);
   }
 
-  update(id: number, data: AbsenceRequest): Observable<AbsenceResponse> {
-    return this.http.put<AbsenceResponse>(`${this.apiUrl}/${id}`, data);
+  update(id: number, data: AbsenceRequest): Observable<ApiResponse<AbsenceResponse>> {
+    return this.http.put<ApiResponse<AbsenceResponse>>(`${this.apiUrl}/${id}`, data);
   }
 
-  validate(id: number, validee: boolean): Observable<AbsenceResponse> {
-    return this.http.patch<AbsenceResponse>(`${this.apiUrl}/${id}/validation`, { validee });
+  validate(id: number, validee: boolean): Observable<ApiResponse<AbsenceResponse>> {
+    return this.http.patch<ApiResponse<AbsenceResponse>>(`${this.apiUrl}/${id}/validation`, { validee });
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  getEtudiantsByModuleClasse(moduleId: number, classeId: number, enseignantId: number): Observable<EtudiantResponse[]> {
-    return this.http.get<EtudiantResponse[]>(`${this.apiUrl}/etudiants`, {
+  getEtudiantsByModuleClasse(moduleId: number, classeId: number, enseignantId: number): Observable<ApiResponse<EtudiantResponse[]>> {
+    return this.http.get<ApiResponse<EtudiantResponse[]>>(`${this.apiUrl}/etudiants`, {
       params: { moduleId, classeId, enseignantId }
     });
   }
 
-  createBulk(data: AbsenceRequest[], enseignantId: number): Observable<AbsenceResponse[]> {
-    return this.http.post<AbsenceResponse[]>(`${this.apiUrl}/bulk`, data, {
+  createBulk(data: AbsenceRequest[], enseignantId: number): Observable<ApiResponse<AbsenceResponse[]>> {
+    return this.http.post<ApiResponse<AbsenceResponse[]>>(`${this.apiUrl}/bulk`, data, {
       params: { enseignantId }
     });
   }

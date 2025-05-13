@@ -1,10 +1,9 @@
-// dashboard-header.component.ts
 import { Component, Inject, OnInit } from '@angular/core';
 import { DOCUMENT, NgIf } from "@angular/common";
 import { Router } from "@angular/router";
 import { ModeHomeComponent } from "../../../pages/home/mode-home/mode-home.component";
 import { AuthService } from "../../../../core/services/auth-service";
-import {Role} from "../../../../core/enums/Role";
+import { Role } from "../../../../core/enums/Role";
 
 @Component({
   selector: 'app-dashboard-header',
@@ -29,27 +28,17 @@ export class DashboardHeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadUserDetails();
-
     this.authService.currentUser$.subscribe(user => {
       if (user) {
         this.updateUserDetails(user);
+      } else {
+        const currentRole = this.authService.getCurrentUserRole();
+        if (!currentRole) {
+          console.log('No current user found, redirecting to login');
+          this.authService.logout();
+        }
       }
     });
-  }
-
-  /**
-   * Load user details using the AuthService
-   */
-  loadUserDetails(): void {
-    const currentUser = this.authService.currentUserSubject?.value;
-
-    if (currentUser) {
-      this.updateUserDetails(currentUser);
-    } else {
-      console.log('No current user found, redirecting to login');
-      this.authService.logout();
-    }
   }
 
   /**
@@ -58,15 +47,10 @@ export class DashboardHeaderComponent implements OnInit {
   updateUserDetails(user: any): void {
     if (!user) return;
 
-    // Set username
     this.username = user.sub || user.username || '';
-
-    // Map user role to display format
     const userRole = this.authService.getCurrentUserRole();
     this.role = userRole;
   }
-
-
 
   /**
    * Toggle fullscreen mode

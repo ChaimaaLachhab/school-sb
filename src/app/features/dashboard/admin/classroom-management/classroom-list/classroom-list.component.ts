@@ -23,9 +23,9 @@ export class ClassroomListComponent implements OnInit {
   }
 
   loadClasses(): void {
-    this.classeService.getAllClasses().subscribe(data => {
-      this.listClasses = data;
-      console.log('Classes chargées:', data);
+    this.classeService.getAllClasses().subscribe(response => {
+      this.listClasses = response.data;
+      console.log('Classes chargées:', response);
     });
   }
 }

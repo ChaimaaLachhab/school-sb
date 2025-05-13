@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
 import { AuthService } from "../../../../core/services/auth-service";
 import { LoginRequest } from "../../../../core/dto/login-request";
 import { Role } from "../../../../core/enums/Role";
 import { NgIf } from "@angular/common";
+import { JwtService } from "../../../../core/services/jwt.service";
+import { JwtResponse } from "../../../../core/dto/jwt-response";
 
 @Component({
   selector: 'app-section-login',
@@ -17,7 +18,7 @@ import { NgIf } from "@angular/common";
   ],
   styleUrls: ['./section-login.component.css']
 })
-export class SectionLoginComponent implements OnInit {
+export class SectionLoginComponent {
   formLogin!: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -25,6 +26,7 @@ export class SectionLoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private jwtService: JwtService,
     private router: Router
   ) {
     this.formLogin = this.fb.group({
@@ -33,49 +35,52 @@ export class SectionLoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.valide();
-  }
-
-  valide() {
-    this.formLogin.reset();
-  }
-
   onSubmit() {
     if (this.formLogin.valid) {
       const request: LoginRequest = this.formLogin.value;
       this.isLoading = true;
-      this.authService.login(request).subscribe(
-        (res) => {
-          const decodedToken: any = jwtDecode(res.token);
-          console.log('Decoded Token:', decodedToken);
-
-          const roles: string[] = decodedToken.roles;
-          console.log('Decoded Roles:', roles);
-
-          // Corriger la vérification des rôles en tenant compte du préfixe 'ROLE_'
-          if (roles.includes('ROLE_' + Role.ADMIN) || roles.includes(Role.ADMIN)) {
-            this.router.navigateByUrl('/dashboard/admin');
-          } else if (roles.includes('ROLE_' + Role.ENSEIGNANT) || roles.includes(Role.ENSEIGNANT)) {
-            this.router.navigateByUrl('/dashboard/enseignant');
-          } else if (roles.includes('ROLE_' + Role.ETUDIANT) || roles.includes(Role.ETUDIANT)) {
-            this.router.navigateByUrl('/dashboard/etudiant');
-          } else if (roles.includes('ROLE_' + Role.PARENT) || roles.includes(Role.PARENT)) {
-            this.router.navigateByUrl('/dashboard/parent');
-          } else {
-            this.errorMessage = 'Rôle non autorisé, veuillez réessayer!';
-          }
-
-          this.isLoading = false;
-          this.ngOnInit();
-        },
-        (error) => {
-          this.errorMessage = 'Échec de connexion. Veuillez vérifier vos identifiants.';
-          this.isLoading = false;
-        }
-      );
+      this.authService.login(request).subscribe({
+        next: (response: JwtResponse) => this.handleLoginSuccess(response),
+        error: (err) => this.handleLoginError(err),
+        complete: () => console.log('Login process complete.')
+      });
     } else {
-      this.errorMessage = 'Le formulaire est invalide. Veuillez remplir tous les champs requis.';
+      this.errorMessage = 'Veuillez remplir tous les champs.';
     }
+  }
+
+  private handleLoginSuccess(response: JwtResponse) {
+    console.log('Login successful:', response);
+
+    const token = response?.token;
+    if (!token) {
+      console.error('No token found in the response.');
+      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+      this.isLoading = false;
+      return;
+    }
+
+    try {
+      const role: string | null = this.jwtService.getUserRole(token);
+      console.log('Extracted role:', role);
+
+      if (role) {
+        this.router.navigate(['/dashboard']);
+      } else {
+        console.error('No role found in the token.');
+        this.errorMessage = 'Accès non autorisé.';
+      }
+    } catch (error) {
+      console.error('Token processing failed:', error);
+      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+    }
+
+    this.isLoading = false;
+  }
+
+  private handleLoginError(error: any) {
+    console.error('Login failed:', error);
+    this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';
+    this.isLoading = false;
   }
 }

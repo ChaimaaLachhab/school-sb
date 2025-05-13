@@ -77,7 +77,7 @@
         <label for="classeId">Classe</label>
         <select id="classeId" formControlName="classeId" class="form-control" (change)="onClasseChange($event)">
           <option value="" disabled>Sélectionnez une classe</option>
-          <option *ngFor="let classe of ListClasse" [value]="classe.id">{{classe.nom}} ({{classe.labelNiveau}})</option>
+          <option *ngFor="let classe of ListClasses" [value]="classe.id">{{classe.nom}} ({{classe.labelNiveau}})</option>
         </select>
       </div>
 
@@ -91,7 +91,7 @@
     <input type="hidden" formControlName="niveauId">
 
     <div class="form-group" id="btnS">
-      <button type="submit" class="btn btn-primary" [disabled]="!FormEleve.valid">Ajouter l'étudiant</button>
+      <button type="submit" class="btn btn-primary" [disabled]="FormEleve.invalid">Ajouter l'étudiant</button>
     </div>
   </form>
 </div>

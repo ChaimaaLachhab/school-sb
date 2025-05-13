@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import {EnseignantService} from "../../../../../core/services/enseignant.service";
@@ -17,6 +17,8 @@ import {Sexe} from "../../../../../core/enums/Sexe";
   styleUrls: ['./teacher-create.component.css']
 })
 export class TeacherCreateComponent implements OnInit {
+  @Output() teacherCreated = new EventEmitter<void>();
+
   formEnseignant!: FormGroup;
 
   constructor(
@@ -69,6 +71,7 @@ export class TeacherCreateComponent implements OnInit {
         next: (response) => {
           alert('Enseignant ajouté avec succès !');
           this.initForm();
+          this.teacherCreated.emit();
         },
         error: (error) => {
           alert('Erreur lors de l\'ajout de l\'enseignant: ' + error.message);

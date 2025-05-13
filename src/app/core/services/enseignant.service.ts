@@ -4,36 +4,37 @@ import { environment } from "../../../environments/environment";
 import { Observable } from 'rxjs';
 import { EnseignantRequest } from '../dto/enseignant/enseignant-request';
 import { EnseignantResponse } from '../dto/enseignant/enseignant-response';
+import {ApiResponse} from "../dto/common/api-response";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnseignantService {
-  private apiUrl = `${environment.apiUrl}/auth/enseignants`;
+  private apiUrl = `${environment.apiUrl}/enseignants`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<EnseignantResponse[]> {
-    return this.http.get<EnseignantResponse[]>(this.apiUrl);
+  getAllEnseignants(): Observable<ApiResponse<EnseignantResponse[]>> {
+    return this.http.get<ApiResponse<EnseignantResponse[]>>(this.apiUrl);
   }
 
-  getById(id: number): Observable<EnseignantResponse> {
-    return this.http.get<EnseignantResponse>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<ApiResponse<EnseignantResponse>> {
+    return this.http.get<ApiResponse<EnseignantResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  getByDepartement(departementId: number): Observable<EnseignantResponse[]> {
-    return this.http.get<EnseignantResponse[]>(`${this.apiUrl}/departement/${departementId}`);
+  getByDepartement(departementId: number): Observable<ApiResponse<EnseignantResponse[]>> {
+    return this.http.get<ApiResponse<EnseignantResponse[]>>(`${this.apiUrl}/departement/${departementId}`);
   }
 
-  create(request: EnseignantRequest): Observable<EnseignantResponse> {
-    return this.http.post<EnseignantResponse>(this.apiUrl, request);
+  create(request: EnseignantRequest): Observable<ApiResponse<EnseignantResponse>> {
+    return this.http.post<ApiResponse<EnseignantResponse>>(this.apiUrl, request);
   }
 
-  update(id: number, request: EnseignantRequest): Observable<EnseignantResponse> {
-    return this.http.put<EnseignantResponse>(`${this.apiUrl}/${id}`, request);
+  update(id: number, request: EnseignantRequest): Observable<ApiResponse<EnseignantResponse>> {
+    return this.http.put<ApiResponse<EnseignantResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 }

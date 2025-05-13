@@ -23,9 +23,9 @@ export class ParentListComponent implements OnInit {
   }
 
   loadParents(): void {
-    this.parentService.getAllParents().subscribe(data => {
-      this.listParents = data;
-      console.log('Parents chargés:', data);
+    this.parentService.getAllParents().subscribe(response => {
+      this.listParents = response.data;
+      console.log('Parents chargés:', response.data);
     });
   }
 

@@ -13,33 +13,47 @@ import { JwtResponse } from "../dto/jwt-response";
   providedIn: 'root'
 })
 export class AuthService {
-
   private apiUrl = `${environment.apiUrl}/auth`;
   currentUserSubject = new BehaviorSubject<any>(this.decodeToken(this.jwtService.getToken()));
-
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
     private jwtService: JwtService,
     private router: Router
-  ) {}
+  ) {
+    // Vérifier si un token existe au démarrage et mettre à jour le subject
+    const token = this.jwtService.getToken();
+    if (token) {
+      this.currentUserSubject.next(this.decodeToken(token));
+    }
+  }
 
   login(request: LoginRequest): Observable<JwtResponse> {
     return this.http.post<JwtResponse>(`${this.apiUrl}/login`, request).pipe(
       tap((response: JwtResponse) => {
-        if (response) {
+        if (response && response.token) {
+          console.log("Token reçu, sauvegarde en cours...");
+          // Enregistrer le token dans localStorage
           this.jwtService.saveToken(response.token);
-          const decoded = this.decodeToken(response.token);
-          this.currentUserSubject.next(decoded);
 
-          // Si le premier rôle existe, le stocker dans localStorage
-          if (decoded && decoded.roles && decoded.roles.length > 0) {
-            const roleWithoutPrefix = this.normalizeRole(decoded.roles[0]);
-            this.jwtService.setUserRole(roleWithoutPrefix);
+          // Décoder le token et mettre à jour le subject
+          const decodedToken = this.decodeToken(response.token);
+          this.currentUserSubject.next(decodedToken);
+
+          // Récupérer et stocker le rôle si présent
+          if (decodedToken && decodedToken.roles && decodedToken.roles.length > 0) {
+            const role = decodedToken.roles[0];
+            const normalizedRole = role.startsWith('ROLE_') ? role.substring(5) : role;
+            this.jwtService.setUserRole(normalizedRole);
+            console.log("Rôle sauvegardé:", normalizedRole);
           }
+
+          // Vérifier que le token a bien été enregistré
+          const storedToken = this.jwtService.getToken();
+          console.log("Token stocké dans localStorage:", storedToken ? "Oui" : "Non");
         } else {
-          console.error('No login response received');
+          console.error('No token in login response');
         }
       })
     );
@@ -64,51 +78,60 @@ export class AuthService {
   logout(): void {
     this.jwtService.removeToken();
     this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    const token = this.jwtService.getToken();
+    if (!token) {
+      return false;
+    }
+
+    try {
+      // Vérifier si le token est expiré
+      const decoded = this.jwtService.decodeToken(token);
+      const isExpired = decoded.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        this.logout();
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de la vérification du token:", error);
+      this.logout();
+      return false;
+    }
   }
 
-  /**
-   * Normalize un rôle en enlevant le préfixe "ROLE_" si présent
-   */
-  private normalizeRole(role: string): string {
-    return role.startsWith('ROLE_') ? role.substring(5) : role;
-  }
-
-  /**
-   * Vérifie si l'utilisateur a un rôle spécifique
-   * Gère à la fois les rôles avec et sans préfixe "ROLE_"
-   */
   hasRole(role: Role): boolean {
     const currentUser = this.currentUserSubject.value;
     if (!currentUser || !currentUser.roles) {
       return false;
     }
 
-    // Normaliser le rôle recherché
-    const normalizedTargetRole = this.normalizeRole(role.toString());
-
-    // Vérifier les rôles de l'utilisateur (en normalisant chacun)
     return currentUser.roles.some((userRole: string) => {
-      const normalizedUserRole = this.normalizeRole(userRole);
-      return normalizedUserRole === normalizedTargetRole;
+      const normalizedUserRole = userRole.startsWith('ROLE_') ? userRole.substring(5) : userRole;
+      const normalizedRole = typeof role === 'string' && role.startsWith('ROLE_') ? role.substring(5) : role;
+
+      return normalizedUserRole === normalizedRole;
     });
   }
 
-  /**
-   * Récupère le rôle actuel de l'utilisateur sans le préfixe "ROLE_"
-   */
   getCurrentUserRole(): Role | null {
     const currentUser = this.currentUserSubject.value;
     if (!currentUser || !currentUser.roles || currentUser.roles.length === 0) {
       return null;
     }
 
-    // Prendre le premier rôle et enlever le préfixe "ROLE_" si présent
-    return this.normalizeRole(currentUser.roles[0]) as Role;
+    const role = currentUser.roles[0];
+    return role.startsWith('ROLE_') ? role.substring(5) as Role : role as Role;
+  }
+
+  // Fonction utilitaire pour normaliser les rôles (enlever le préfixe ROLE_)
+  normalizeRole(role: string): string {
+    return role.startsWith('ROLE_') ? role.substring(5) : role;
   }
 
   private decodeToken(token: string | null): any {

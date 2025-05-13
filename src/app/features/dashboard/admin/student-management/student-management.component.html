@@ -1,14 +1,25 @@
+<!-- module-management.component.html -->
 <div class="main">
-    <div class="main-wrapper">
-        <div class="first-section">
-            <div class="add-prof">
-                <app-student-create></app-student-create>
-            </div>
-            <div class="prof">
-                <!-- <app-dash-admin-add-eleve></app-dash-admin-add-eleve> -->
-                <app-student-list></app-student-list>
-            </div>
-
+  <div class="main-wrapper">
+    <div class="first-section">
+      <div class="prof">
+        <div class="header-section">
+          <button class="add-button" (click)="openModal()">Ajouter un module</button>
         </div>
+        <app-student-list></app-student-list>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Modal pour créer un module -->
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close-button" (click)="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <app-student-create (studentCreated)="onStudentCreated()"></app-student-create>
+    </div>
+  </div>
 </div>

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SeanceRequest } from '../dto/seance/seance-request';
 import { SeanceResponse } from '../dto/seance/seance-response';
+import { ApiResponse } from '../dto/common/api-response';
 
 @Injectable({ providedIn: 'root' })
 export class SeanceService {
@@ -11,55 +12,55 @@ export class SeanceService {
 
   constructor(private http: HttpClient) {}
 
-  getAllSeances(): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}`);
+  getAllSeances(): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}`);
   }
 
-  getSeanceById(id: number): Observable<SeanceResponse> {
-    return this.http.get<SeanceResponse>(`${this.apiUrl}/${id}`);
+  getSeanceById(id: number): Observable<ApiResponse<SeanceResponse>> {
+    return this.http.get<ApiResponse<SeanceResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  getSeancesByModule(moduleId: number): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/module/${moduleId}`);
+  getSeancesByModule(moduleId: number): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/module/${moduleId}`);
   }
 
-  getSeancesByEnseignant(enseignantId: number): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/enseignant/${enseignantId}`);
+  getSeancesByEnseignant(enseignantId: number): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/enseignant/${enseignantId}`);
   }
 
-  getSeancesByStatut(statut: string): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/statut/${statut}`);
+  getSeancesByStatut(statut: string): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/statut/${statut}`);
   }
 
-  getSeancesByDate(date: string): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/date/${date}`);
+  getSeancesByDate(date: string): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/date/${date}`);
   }
 
-  getSeancesByEnseignantAndPeriode(id: number, debut: string, fin: string): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/enseignant/${id}/periode?debut=${debut}&fin=${fin}`);
+  getSeancesByEnseignantAndPeriode(id: number, debut: string, fin: string): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/enseignant/${id}/periode?debut=${debut}&fin=${fin}`);
   }
 
-  getSeancesByClasseAndDate(classeId: number, date: string): Observable<SeanceResponse[]> {
-    return this.http.get<SeanceResponse[]>(`${this.apiUrl}/classe/${classeId}/date/${date}`);
+  getSeancesByClasseAndDate(classeId: number, date: string): Observable<ApiResponse<SeanceResponse[]>> {
+    return this.http.get<ApiResponse<SeanceResponse[]>>(`${this.apiUrl}/classe/${classeId}/date/${date}`);
   }
 
-  createSeance(request: SeanceRequest): Observable<SeanceResponse> {
-    return this.http.post<SeanceResponse>(`${this.apiUrl}`, request);
+  createSeance(request: SeanceRequest): Observable<ApiResponse<SeanceResponse>> {
+    return this.http.post<ApiResponse<SeanceResponse>>(`${this.apiUrl}`, request);
   }
 
-  updateSeance(id: number, request: SeanceRequest): Observable<SeanceResponse> {
-    return this.http.put<SeanceResponse>(`${this.apiUrl}/${id}`, request);
+  updateSeance(id: number, request: SeanceRequest): Observable<ApiResponse<SeanceResponse>> {
+    return this.http.put<ApiResponse<SeanceResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
-  updateStatut(id: number, statut: string): Observable<SeanceResponse> {
-    return this.http.patch<SeanceResponse>(`${this.apiUrl}/${id}/statut`, { statut });
+  updateStatut(id: number, statut: string): Observable<ApiResponse<SeanceResponse>> {
+    return this.http.patch<ApiResponse<SeanceResponse>>(`${this.apiUrl}/${id}/statut`, { statut });
   }
 
-  deleteSeance(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteSeance(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  activerSeance(id: number, actif: boolean): Observable<SeanceResponse> {
-    return this.http.patch<SeanceResponse>(`${this.apiUrl}/${id}/actif`, { actif });
+  activerSeance(id: number, actif: boolean): Observable<ApiResponse<SeanceResponse>> {
+    return this.http.patch<ApiResponse<SeanceResponse>>(`${this.apiUrl}/${id}/actif`, { actif });
   }
 }

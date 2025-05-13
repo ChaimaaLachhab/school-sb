@@ -35,27 +35,27 @@ export class TeacherListComponent implements OnInit {
       departementId: ['', Validators.required],
     });
 
-    this.classeService.getAllClasses().subscribe((data) => {
-      this.listeClasses = data;
+    this.classeService.getAllClasses().subscribe((response) => {
+      this.listeClasses = response.data;
     });
 
-    this.enseignantService.getAll().subscribe((data) => {
-      this.listeEnseignants = data;
+    this.enseignantService.getAllEnseignants().subscribe((response) => {
+      this.listeEnseignants = response.data;
     });
   }
 
   search() {
     if (this.searchForm.valid) {
       const selectedDepartementId = this.searchForm.value.departementId;
-      this.enseignantService.getByDepartement(selectedDepartementId).subscribe((data) => {
-        this.listeEnseignants = data;
+      this.enseignantService.getByDepartement(selectedDepartementId).subscribe((response) => {
+        this.listeEnseignants = response.data;
       });
     }
   }
 
   reload() {
-    this.enseignantService.getAll().subscribe((data) => {
-      this.listeEnseignants = data;
+    this.enseignantService.getAllEnseignants().subscribe((response) => {
+      this.listeEnseignants = response.data;
       this.searchForm.reset();
     });
   }

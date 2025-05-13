@@ -4,10 +4,12 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { inject } from '@angular/core';
 import {AuthService} from "../services/auth-service";
+import {JwtService} from "../services/jwt.service";
 
 export const AuthInterceptor: HttpInterceptorFn = (request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
-  const token = localStorage.getItem('token');
+  const jwtService = inject(JwtService);
+  const token = jwtService.getToken();
 
   if (token) {
     request = request.clone({

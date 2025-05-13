@@ -4,44 +4,45 @@ import { environment } from "../../../environments/environment";
 import { Observable } from 'rxjs';
 import { UtilisateurRequest } from '../dto/utilisateur/utilisateur-request';
 import { UtilisateurResponse } from '../dto/utilisateur/utilisateur-response';
+import { ApiResponse } from '../dto/common/api-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilisateurService {
-  private apiUrl = `${environment.apiUrl}/auth/utilisateurs`;
+  private apiUrl = `${environment.apiUrl}/utilisateurs`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<UtilisateurResponse[]> {
-    return this.http.get<UtilisateurResponse[]>(this.apiUrl);
+  getAll(): Observable<ApiResponse<UtilisateurResponse[]>> {
+    return this.http.get<ApiResponse<UtilisateurResponse[]>>(this.apiUrl);
   }
 
-  getById(id: number): Observable<UtilisateurResponse> {
-    return this.http.get<UtilisateurResponse>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<ApiResponse<UtilisateurResponse>> {
+    return this.http.get<ApiResponse<UtilisateurResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  create(request: UtilisateurRequest): Observable<UtilisateurResponse> {
-    return this.http.post<UtilisateurResponse>(this.apiUrl, request);
+  create(request: UtilisateurRequest): Observable<ApiResponse<UtilisateurResponse>> {
+    return this.http.post<ApiResponse<UtilisateurResponse>>(this.apiUrl, request);
   }
 
-  update(id: number, request: UtilisateurRequest): Observable<UtilisateurResponse> {
-    return this.http.put<UtilisateurResponse>(`${this.apiUrl}/${id}`, request);
+  update(id: number, request: UtilisateurRequest): Observable<ApiResponse<UtilisateurResponse>> {
+    return this.http.put<ApiResponse<UtilisateurResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  getByRole(role: string): Observable<UtilisateurResponse[]> {
-    return this.http.get<UtilisateurResponse[]>(`${this.apiUrl}/role/${role}`);
+  getByRole(role: string): Observable<ApiResponse<UtilisateurResponse[]>> {
+    return this.http.get<ApiResponse<UtilisateurResponse[]>>(`${this.apiUrl}/role/${role}`);
   }
 
-  existsByUsername(username: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.apiUrl}/exists/username/${username}`);
+  existsByUsername(username: string): Observable<ApiResponse<boolean>> {
+    return this.http.get<ApiResponse<boolean>>(`${this.apiUrl}/exists/username/${username}`);
   }
 
-  existsByEmail(email: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.apiUrl}/exists/email/${email}`);
+  existsByEmail(email: string): Observable<ApiResponse<boolean>> {
+    return this.http.get<ApiResponse<boolean>>(`${this.apiUrl}/exists/email/${email}`);
   }
 }

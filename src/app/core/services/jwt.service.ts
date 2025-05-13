@@ -8,42 +8,101 @@ import { Role } from "../enums/Role";
 export class JwtService {
 
   decodeToken(token: string): any {
-    return jwtDecode(token);
+    try {
+      return jwtDecode(token);
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 
   getUserRole(token: string): string | null {
-    const decodedToken = this.decodeToken(token);
-    if (decodedToken?.roles && decodedToken.roles.length > 0) {
-      const role = decodedToken.roles[0];
-      return role.startsWith('ROLE_') ? role.substring(5) : role;
+    try {
+      const decodedToken = this.decodeToken(token);
+      if (decodedToken?.roles && decodedToken.roles.length > 0) {
+        const role = decodedToken.roles[0];
+        return role.startsWith('ROLE_') ? role.substring(5) : role;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user role:', error);
+      return null;
     }
-    return null;
   }
 
   saveToken(token: string): void {
-    localStorage.setItem('token', token);
+    try {
+      localStorage.setItem('token', token);
+      console.log('Token saved to localStorage successfully');
+      // Double vérification
+      const storedToken = localStorage.getItem('token');
+      if (storedToken !== token) {
+        console.warn('Token not properly saved to localStorage');
+      }
+    } catch (error) {
+      console.error('Error saving token to localStorage:', error);
+    }
   }
 
-  setUserRole(role: string) {
-    localStorage.setItem('userRole', role);
+  setUserRole(role: string): void {
+    try {
+      localStorage.setItem('userRole', role);
+      console.log('Role saved to localStorage:', role);
+    } catch (error) {
+      console.error('Error saving role to localStorage:', error);
+    }
   }
 
   getUserRoleFromStorage(): string | null {
-    return localStorage.getItem('userRole');
+    try {
+      return localStorage.getItem('userRole');
+    } catch (error) {
+      console.error('Error getting role from localStorage:', error);
+      return null;
+    }
   }
 
   getUsernameFromToken(token: string): string | null {
-    const decodedToken = this.decodeToken(token);
-    return decodedToken?.sub || null;
+    try {
+      const decodedToken = this.decodeToken(token);
+      return decodedToken?.sub || null;
+    } catch (error) {
+      console.error('Error getting username from token:', error);
+      return null;
+    }
   }
 
   removeToken(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      console.log('Token and role removed from localStorage');
+    } catch (error) {
+      console.error('Error removing token from localStorage:', error);
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log('No token found in localStorage');
+      }
+      return token;
+    } catch (error) {
+      console.error('Error getting token from localStorage:', error);
+      return null;
+    }
+  }
+
+  isTokenExpired(token: string): boolean {
+    try {
+      const decodedToken: any = this.decodeToken(token);
+      return decodedToken.exp * 1000 < Date.now();
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true;
+    }
   }
 
   isAdmin(): boolean {

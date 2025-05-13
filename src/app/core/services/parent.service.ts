@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ParentRequest } from '../dto/parent/parent-request';
 import { ParentResponse } from '../dto/parent/parent-response';
 import { environment } from '../../../environments/environment';
+import {ApiResponse} from "../dto/common/api-response";
 
 @Injectable({
   providedIn: 'root'
@@ -14,27 +15,27 @@ export class ParentService {
 
   constructor(private http: HttpClient) {}
 
-  getAllParents(): Observable<ParentResponse[]> {
-    return this.http.get<ParentResponse[]>(`${this.apiUrl}`);
+  getAllParents(): Observable<ApiResponse<ParentResponse[]>> {
+    return this.http.get<ApiResponse<ParentResponse[]>>(`${this.apiUrl}`);
   }
 
-  getParentById(id: number): Observable<ParentResponse> {
-    return this.http.get<ParentResponse>(`${this.apiUrl}/${id}`);
+  getParentById(id: number): Observable<ApiResponse<ParentResponse>> {
+    return this.http.get<ApiResponse<ParentResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  getParentsByEtudiantId(etudiantId: number): Observable<ParentResponse[]> {
-    return this.http.get<ParentResponse[]>(`${this.apiUrl}/etudiant/${etudiantId}`);
+  getParentsByEtudiantId(etudiantId: number): Observable<ApiResponse<ParentResponse[]>> {
+    return this.http.get<ApiResponse<ParentResponse[]>>(`${this.apiUrl}/etudiant/${etudiantId}`);
   }
 
-  createParent(request: ParentRequest): Observable<ParentResponse> {
-    return this.http.post<ParentResponse>(`${this.apiUrl}`, request);
+  createParent(request: ParentRequest): Observable<ApiResponse<ParentResponse>> {
+    return this.http.post<ApiResponse<ParentResponse>>(`${this.apiUrl}`, request);
   }
 
-  updateParent(id: number, request: ParentRequest): Observable<ParentResponse> {
-    return this.http.put<ParentResponse>(`${this.apiUrl}/${id}`, request);
+  updateParent(id: number, request: ParentRequest): Observable<ApiResponse<ParentResponse>> {
+    return this.http.put<ApiResponse<ParentResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
-  deleteParent(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteParent(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 }

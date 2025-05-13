@@ -25,18 +25,17 @@
   <div class="user-info">
     <div class="profile-img">
 <!--      <img [src]="'assets/images/avatars/' + role + '.png'" alt="User Profile">-->
-      <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt="User Profile">
+      <img src='' alt="">
     </div>
-    <div class="user-details">
-      <h1>
-        <p *ngIf="username">{{ username }}</p>
-        <div class="role-container">
-          <span *ngIf="role" class="user-role">{{ role }}</span>
-          <a (click)="logout()" class="logout-button">
-            <i class="pi pi-sign-out"></i>
-          </a>
-        </div>
-      </h1>
-    </div>
+    <h1>
+      <p *ngIf="username">{{ username }}</p>
+      <br>
+      <div>
+        <span *ngIf="role">{{ role }}</span>
+        <a (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+        </a>
+      </div>
+    </h1>
   </div>
 </header>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ParentRequest } from '../../../../../core/dto/parent/parent-request';
@@ -14,6 +14,7 @@ import { Role } from '../../../../../core/enums/Role';
   styleUrls: ['./parent-create.component.css']
 })
 export class ParentCreateComponent implements OnInit {
+  @Output() moduleCreated = new EventEmitter<void>();
   formParent!: FormGroup;
   sexeOptions = Object.values(Sexe);
 
@@ -56,6 +57,7 @@ export class ParentCreateComponent implements OnInit {
         (response) => {
           console.log('Parent créé avec succès:', response);
           this.resetForm();
+          this.moduleCreated.emit();
         },
         (error) => {
           console.error('Erreur lors de la création du parent:', error);

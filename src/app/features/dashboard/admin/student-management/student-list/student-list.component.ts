@@ -1,16 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { DatePipe, NgForOf, NgIf } from "@angular/common";
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable, MatTableDataSource, MatTableModule
-} from "@angular/material/table";
-import { MatSort, MatSortModule } from "@angular/material/sort";
+// student-list.component.ts
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { CommonModule, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ClasseResponse } from "../../../../../core/dto/classe/classe-response";
 import { EtudiantResponse } from "../../../../../core/dto/etudiant/etudiant-response";
 import { EtudiantService } from "../../../../../core/services/etudiant.service";
@@ -26,15 +19,24 @@ import { ClasseService } from "../../../../../core/services/classe.service";
     ReactiveFormsModule,
     MatTableModule,
     MatSortModule,
-    DatePipe
+    DatePipe,
+    CommonModule
   ],
   styleUrls: ['./student-list.component.css']
 })
 export class StudentListComponent implements OnInit {
-  displayedColumns: string[] = ['numeroEtudiant', 'nom', 'prenom', 'email', 'sexe', 'dateNaissance'];
+  // Ajout de la colonne "actions" dans les colonnes affichées
+  displayedColumns: string[] = ['numeroEtudiant', 'nom', 'prenom', 'email', 'sexe', 'dateNaissance', 'actions'];
   FromSearch!: FormGroup;
   ListClasses: ClasseResponse[] = [];
   dataSource = new MatTableDataSource<EtudiantResponse>([]);
+
+  // Variables pour la confirmation de suppression
+  showDeleteConfirmation = false;
+  etudiantIdToDelete: number | null = null;
+
+  // Événement pour l'édition d'un étudiant
+  @Output() editStudentEvent = new EventEmitter<EtudiantResponse>();
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -102,5 +104,41 @@ export class StudentListComponent implements OnInit {
   reload() {
     this.FromSearch.reset();
     this.loadAllStudents();
+  }
+
+  // Méthode pour éditer un étudiant
+  editStudent(etudiant: EtudiantResponse): void {
+    this.editStudentEvent.emit(etudiant);
+  }
+
+  // Méthode pour demander confirmation avant suppression
+  deleteStudent(id: number): void {
+    this.etudiantIdToDelete = id;
+    this.showDeleteConfirmation = true;
+  }
+
+  // Méthode pour annuler la suppression
+  cancelDelete(): void {
+    this.showDeleteConfirmation = false;
+    this.etudiantIdToDelete = null;
+  }
+
+  // Méthode pour confirmer la suppression
+  confirmDelete(): void {
+    if (this.etudiantIdToDelete) {
+      this.etudiantService.deleteEtudiant(this.etudiantIdToDelete).subscribe({
+        next: (response) => {
+          console.log('Étudiant supprimé avec succès');
+          this.loadAllStudents(); // Recharger la liste après suppression
+          this.showDeleteConfirmation = false;
+          this.etudiantIdToDelete = null;
+        },
+        error: (error) => {
+          console.error('Erreur lors de la suppression de l\'étudiant:', error);
+          this.showDeleteConfirmation = false;
+          this.etudiantIdToDelete = null;
+        }
+      });
+    }
   }
 }

@@ -78,7 +78,7 @@ export class AuthService {
   logout(): void {
     this.jwtService.removeToken();
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['']);
   }
 
   isLoggedIn(): boolean {

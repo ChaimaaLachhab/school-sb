@@ -20,6 +20,7 @@ export class DashboardHeaderComponent implements OnInit {
   personId!: number;
   role!: Role | null;
   notifications: number = 0;
+  private hasRedirected = false;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -33,7 +34,8 @@ export class DashboardHeaderComponent implements OnInit {
         this.updateUserDetails(user);
       } else {
         const currentRole = this.authService.getCurrentUserRole();
-        if (!currentRole) {
+        if (!currentRole && !this.hasRedirected) {
+          this.hasRedirected = true;
           console.log('No current user found, redirecting to login');
           this.authService.logout();
         }

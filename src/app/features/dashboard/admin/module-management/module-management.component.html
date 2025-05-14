@@ -4,22 +4,26 @@
     <div class="first-section">
       <div class="prof">
         <div class="header-section">
-          <button class="add-button" (click)="openModal()">Ajouter un module</button>
+          <button class="add-button" (click)="openModal()">Ajouter une module</button>
         </div>
-        <app-module-list></app-module-list>
+        <app-module-list (editModuleEvent)="onEditModule($event)"></app-module-list>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal pour créer un module -->
+<!-- Modal pour créer/éditer une module -->
 <div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <div class="modal-header">
       <span class="close-button" (click)="closeModal()">&times;</span>
     </div>
     <div class="modal-body">
-      <app-module-create (moduleCreated)="onModuleCreated()"></app-module-create>
+      <app-module-create
+        [moduleToEdit]="moduleToEdit"
+        (moduleCreated)="onModuleCreated()"
+        (moduleUpdated)="onModuleUpdated()">
+      </app-module-create>
     </div>
   </div>
 </div>

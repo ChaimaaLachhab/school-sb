@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+// classroom-management.component.ts
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClassroomListComponent } from "./classroom-list/classroom-list.component";
 import { ClassroomCreateComponent } from "./classroom-create/classroom-create.component";
-import {ModuleCreateComponent} from "../module-management/module-create/module-create.component";
-import {ModuleListComponent} from "../module-management/module-list/module-list.component";
+import {ClasseResponse} from "../../../../core/dto/classe/classe-response";
 
 @Component({
   selector: 'app-gestion-des-classrooms',
@@ -12,24 +12,45 @@ import {ModuleListComponent} from "../module-management/module-list/module-list.
   imports: [
     CommonModule,
     ClassroomListComponent,
-    ClassroomCreateComponent,
-    ModuleCreateComponent,
-    ModuleListComponent
+    ClassroomCreateComponent
   ],
   styleUrls: ['./classroom-management.component.css']
 })
 export class ClassroomManagementComponent {
+  @ViewChild(ClassroomListComponent) listComponent!: ClassroomListComponent;
+
   showModal = false;
+  classeToEdit: ClasseResponse | null = null;
 
   openModal() {
     this.showModal = true;
+    document.body.style.overflow = 'hidden';
   }
 
   closeModal() {
     this.showModal = false;
+    this.classeToEdit = null;
+    document.body.style.overflow = 'auto';
   }
 
   onClassCreated() {
     this.closeModal();
+    this.refreshClassList();
+  }
+
+  onClassUpdated() {
+    this.closeModal();
+    this.refreshClassList();
+  }
+
+  onEditClass(classe: ClasseResponse) {
+    this.classeToEdit = classe;
+    this.openModal();
+  }
+
+  refreshClassList() {
+    if (this.listComponent) {
+      this.listComponent.loadClasses();
+    }
   }
 }

@@ -1,25 +1,29 @@
-<!-- module-management.component.html -->
+<!-- parent-management.component.html -->
 <div class="main">
   <div class="main-wrapper">
     <div class="first-section">
       <div class="prof">
         <div class="header-section">
-          <button class="add-button" (click)="openModal()">Ajouter un module</button>
+          <button class="add-button" (click)="openModal()">Ajouter un parent</button>
         </div>
-        <app-parent-list></app-parent-list>
+        <app-parent-list (editParentEvent)="onEditParent($event)"></app-parent-list>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal pour créer un module -->
+<!-- Modal pour créer/éditer un parent -->
 <div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <div class="modal-header">
       <span class="close-button" (click)="closeModal()">&times;</span>
     </div>
     <div class="modal-body">
-      <app-parent-create (parentCreated)="onParentCreated()"></app-parent-create>
+      <app-parent-create
+        [parentToEdit]="parentToEdit"
+        (parentCreated)="onParentCreated()"
+        (parentUpdated)="onParentUpdated()">
+      </app-parent-create>
     </div>
   </div>
 </div>

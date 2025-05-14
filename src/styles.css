@@ -9,8 +9,8 @@
 }
 
 ::selection{
-  background: black;
-  color: white;
+  background: black !important;
+  color: white !important;
 }
 :root {
   --primary-color: #fff !important;
@@ -39,25 +39,25 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-border);
+  background: var(--color-border) !important;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--text-color);
+  background: var(--text-color) !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: black;
+  background: black !important;
 }
 
 .dark-theme {
-  --primary-color: #111827;
-  --background-color: #1F2937;
-  --hover-color:#111827;
-  --hover-bg:#F3F6FD;
-  --text-color: #fff;
-  --color-border:#6c6c6c;
-  --bg-header:#00000030;
+  --primary-color: #111827 !important;
+  --background-color: #1F2937 !important;
+  --hover-color:#111827 !important;
+  --hover-bg:#F3F6FD !important;
+  --text-color: #fff !important;
+  --color-border:#6c6c6c !important;
+  --bg-header:#00000030 !important;
   --gradient-color : linear-gradient(360deg , var(--background-color) , rgba(0, 0, 0, 0.023));
   --bg-service: url("./assets/images/dfsdfdf-min.jpg") no-repeat top right/cover;
   --tb-color:#d8e0e7;
@@ -67,14 +67,14 @@
 }
 
 body {
-  color: var(--text-color);
-  background-color: var(--background-color);
+  color: var(--text-color) !important;
+  background-color: var(--background-color) !important;
   width: 100%;
   height: 100vh;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--primary-color) !important;
 }
 
 html, body { height: 100%; }

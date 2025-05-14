@@ -1,3 +1,4 @@
+<!-- teacher-list.component.html -->
 <div class="head">
   <h1>Enseignants</h1>
   <form [formGroup]="searchForm" (ngSubmit)="search()">
@@ -58,8 +59,40 @@
       <td mat-cell *matCellDef="let enseignant">{{ enseignant.specialite }}</td>
     </ng-container>
 
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell id="th" *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let enseignant">
+        <div class="action-buttons">
+          <button class="edit-btn" (click)="editTeacher(enseignant)">
+            <span class="material-icons">edit</span> Modifier
+          </button>
+          <button class="delete-btn" (click)="deleteTeacher(enseignant.id)">
+            <span class="material-icons">delete</span> Supprimer
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
     <!-- Header and Row Declarations -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <!-- Row shown when no matching data is found -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="8">Aucun enseignant trouvé</td>
+    </tr>
   </table>
-</div>Z
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="confirm-modal" *ngIf="showDeleteConfirmation">
+  <div class="confirm-content">
+    <h3>Confirmation de suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer cet enseignant ?</p>
+    <div class="confirm-buttons">
+      <button class="cancel-btn" (click)="cancelDelete()">Annuler</button>
+      <button class="confirm-btn" (click)="confirmDelete()">Confirmer</button>
+    </div>
+  </div>
+</div>

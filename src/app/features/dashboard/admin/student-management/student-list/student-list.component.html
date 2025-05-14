@@ -50,7 +50,22 @@
     <!-- Date de Naissance Column -->
     <ng-container matColumnDef="dateNaissance">
       <th mat-header-cell id="th" *matHeaderCellDef mat-sort-header> Date de Naissance </th>
-      <td mat-cell *matCellDef="let etudiant"> {{ etudiant.dateNaissance | date:'dd/MM/yyyy' }} </td>
+      <td mat-cell *matCellDef="let etudiant"> {{ etudiant.dateNaissance }} </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell id="th" *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let etudiant">
+        <div class="action-buttons">
+          <button class="edit-btn" (click)="editStudent(etudiant)">
+            <span class="material-icons">edit</span> Modifier
+          </button>
+          <button class="delete-btn" (click)="deleteStudent(etudiant.id)">
+            <span class="material-icons">delete</span> Supprimer
+          </button>
+        </div>
+      </td>
     </ng-container>
 
     <!-- Header and Row Declarations -->
@@ -59,7 +74,19 @@
 
     <!-- Row shown when no matching data is found -->
     <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell" colspan="6">Aucun étudiant trouvé</td>
+      <td class="mat-cell" colspan="7">Aucun étudiant trouvé</td>
     </tr>
   </table>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="confirm-modal" *ngIf="showDeleteConfirmation">
+  <div class="confirm-content">
+    <h3>Confirmation de suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer cet étudiant ?</p>
+    <div class="confirm-buttons">
+      <button class="cancel-btn" (click)="cancelDelete()">Annuler</button>
+      <button class="confirm-btn" (click)="confirmDelete()">Confirmer</button>
+    </div>
+  </div>
 </div>

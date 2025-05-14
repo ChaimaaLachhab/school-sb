@@ -4,11 +4,11 @@
   <ul>
     <li>
       <a
-        routerLink="/dashboard/admin"
-        (click)="setActiveLink('/dashboard/admin')"
-        [ngClass]="{ 'active': isLinkActive('/dashboard/admin') }">
+        routerLink="/dashboard/admin/student"
+        (click)="setActiveLink('/dashboard/admin/student')"
+        [ngClass]="{ 'active': isLinkActive('/dashboard/admin/student') }">
         <i class="pi pi-home"></i>
-        <p [ngClass]="{ 'active-p': isLinkActive('/dashboard/admin') }">Home</p>
+        <p [ngClass]="{ 'active-p': isLinkActive('/dashboard/admin/student') }">Student</p>
       </a>
     </li>
 
@@ -18,7 +18,7 @@
         (click)="setActiveLink('/dashboard/admin/profs')"
         [ngClass]="{ 'active': isLinkActive('/dashboard/admin/profs') }">
         <i class="pi pi-users"></i>
-        <p [ngClass]="{ 'active-p': isLinkActive('/dashboard/admin/profs') }">Gestion Profs</p>
+        <p [ngClass]="{ 'active-p': isLinkActive('/dashboard/admin/profs') }">Profs</p>
       </a>
     </li>
 

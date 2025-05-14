@@ -1,3 +1,4 @@
+<!-- parent-list.component.html -->
 <h1>Les Parents D'Élèves</h1>
 <div class="cont">
   <table mat-table [dataSource]="listParents" matSort class="mat-elevation-z8">
@@ -32,8 +33,40 @@
       <td mat-cell *matCellDef="let parent"> {{ getEnfantsList(parent) }} </td>
     </ng-container>
 
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell id="th" *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let parent">
+        <div class="action-buttons">
+          <button class="edit-btn" (click)="editParent(parent)">
+            <span class="material-icons">edit</span> Modifier
+          </button>
+          <button class="delete-btn" (click)="deleteParent(parent.id)">
+            <span class="material-icons">delete</span> Supprimer
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
     <!-- Header and Row Declarations -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <!-- Row shown when no matching data is found -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="7">Aucun parent trouvé</td>
+    </tr>
   </table>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="confirm-modal" *ngIf="showDeleteConfirmation">
+  <div class="confirm-content">
+    <h3>Confirmation de suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer ce parent ?</p>
+    <div class="confirm-buttons">
+      <button class="cancel-btn" (click)="cancelDelete()">Annuler</button>
+      <button class="confirm-btn" (click)="confirmDelete()">Confirmer</button>
+    </div>
+  </div>
 </div>

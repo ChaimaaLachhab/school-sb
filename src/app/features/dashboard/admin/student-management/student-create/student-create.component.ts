@@ -1,11 +1,12 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgForOf, CommonModule } from "@angular/common";
+import { CommonModule, NgForOf } from "@angular/common";
 import { ClasseResponse } from "../../../../../core/dto/classe/classe-response";
 import { EtudiantService } from "../../../../../core/services/etudiant.service";
 import { ClasseService } from "../../../../../core/services/classe.service";
 import { EtudiantRequest } from "../../../../../core/dto/etudiant/etudiant-request";
 import { Role } from "../../../../../core/enums/Role";
+import { EtudiantResponse } from "../../../../../core/dto/etudiant/etudiant-response";
 
 @Component({
   selector: 'app-student-create',
@@ -18,11 +19,14 @@ import { Role } from "../../../../../core/enums/Role";
   ],
   styleUrls: ['./student-create.component.css']
 })
-export class StudentCreateComponent implements OnInit {
+export class StudentCreateComponent implements OnInit, OnChanges {
   @Output() studentCreated = new EventEmitter<void>();
+  @Output() studentUpdated = new EventEmitter<void>();
+  @Input() etudiantToEdit: EtudiantResponse | null = null;
 
   FormEleve!: FormGroup;
   ListClasses: ClasseResponse[] = [];
+  isEditMode = false;
 
   anneeScolaireCourante: string = new Date().getFullYear() + "-" + (new Date().getFullYear() + 1);
 
@@ -37,13 +41,24 @@ export class StudentCreateComponent implements OnInit {
     this.loadClasses();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // Réagir lorsqu'un étudiant est reçu pour édition
+    if (changes['etudiantToEdit'] && changes['etudiantToEdit'].currentValue) {
+      this.isEditMode = true;
+      this.updateFormWithStudentData();
+    } else if (changes['etudiantToEdit'] && !changes['etudiantToEdit'].currentValue) {
+      this.isEditMode = false;
+      this.resetForm();
+    }
+  }
+
   initForm(): void {
     this.FormEleve = this.fb.group({
       nom: ['', [Validators.required, Validators.minLength(2)]],
       prenom: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
       telephone: [''],
       dateNaissance: ['', Validators.required],
       adresse: [''],
@@ -61,6 +76,11 @@ export class StudentCreateComponent implements OnInit {
         if (response && response.success) {
           this.ListClasses = response.data;
           console.log("Classes chargées: " + response.data.length);
+
+          // Si en mode édition, mettre à jour le formulaire après chargement des classes
+          if (this.isEditMode && this.etudiantToEdit) {
+            this.updateFormWithStudentData();
+          }
         } else {
           console.error("Erreur lors du chargement des classes: réponse non valide", response);
           this.ListClasses = [];
@@ -73,74 +93,51 @@ export class StudentCreateComponent implements OnInit {
     });
   }
 
-  addEleve() {
+  updateFormWithStudentData(): void {
+    if (this.etudiantToEdit && this.FormEleve) {
+      // Convertir la date au format yyyy-MM-dd pour l'input date
+      let dateNaissance = this.etudiantToEdit.dateNaissance;
+
+      // Si la date est au format dd-MM-yyyy, convertir en yyyy-MM-dd
+      if (dateNaissance && dateNaissance.includes('-')) {
+        const parts = dateNaissance.split('-');
+        if (parts.length === 3 && parts[0].length === 2) {
+          dateNaissance = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
+
+      // Mettre à jour le formulaire avec les données de l'étudiant
+      this.FormEleve.patchValue({
+        nom: this.etudiantToEdit.nom,
+        prenom: this.etudiantToEdit.prenom,
+        email: this.etudiantToEdit.email,
+        username: this.etudiantToEdit.username,
+        // Ne pas remplir le mot de passe pour des raisons de sécurité
+        telephone: this.etudiantToEdit.telephone,
+        dateNaissance: dateNaissance,
+        adresse: this.etudiantToEdit.adresse,
+        sexe: this.etudiantToEdit.sexe,
+        numeroEtudiant: this.etudiantToEdit.numeroEtudiant,
+        filiere: this.etudiantToEdit.filiere,
+        classeId: this.etudiantToEdit.classeId,
+        niveauId: this.etudiantToEdit.niveauId
+      });
+
+      // En mode édition, le mot de passe est optionnel
+      const passwordControl = this.FormEleve.get('password');
+      if (passwordControl) {
+        passwordControl.setValidators(this.isEditMode ? [Validators.minLength(6)] : [Validators.required, Validators.minLength(6)]);
+        passwordControl.updateValueAndValidity();
+      }
+    }
+  }
+
+  onSubmit(): void {
     if (this.FormEleve.valid) {
-      try {
-        // Récupération de la date sélectionnée
-        const dateNaissanceInput = this.FormEleve.value.dateNaissance;
-        const dateNaissance = this.formatDateForBackend(dateNaissanceInput);
-
-        // Date d'inscription (aujourd'hui)
-        const dateInscription = this.formatDateForBackend(new Date().toISOString().split('T')[0]);
-
-        console.log("Date formatée pour l'API:", dateNaissance);
-
-        // Création de l'objet EtudiantRequest
-        const newEtudiant: EtudiantRequest = {
-          nom: this.FormEleve.value.nom,
-          prenom: this.FormEleve.value.prenom,
-          email: this.FormEleve.value.email,
-          username: this.FormEleve.value.username,
-          password: this.FormEleve.value.password,
-          telephone: this.FormEleve.value.telephone || "",
-          dateNaissance: dateNaissance,
-          adresse: this.FormEleve.value.adresse || "",
-          sexe: this.FormEleve.value.sexe,
-          role: Role.ETUDIANT,
-          numeroEtudiant: this.FormEleve.value.numeroEtudiant,
-          filiere: this.FormEleve.value.filiere || "",
-          classeId: Number(this.FormEleve.value.classeId),
-          niveauId: Number(this.FormEleve.value.niveauId),
-          dateInscription: dateInscription,
-          anneeScolaire: this.anneeScolaireCourante,
-          photo: ""
-        };
-
-        console.log("Étudiant à créer:", JSON.stringify(newEtudiant));
-
-        // Envoi de la requête au service
-        this.etudiantService.createEtudiant(newEtudiant).subscribe({
-          next: (response) => {
-            console.log("Réponse de création:", response);
-
-            if (response.success) {
-              alert("Étudiant créé avec succès!");
-              this.resetForm();
-              this.studentCreated.emit();
-            } else {
-              alert("Erreur lors de la création de l'étudiant: " + response.message);
-            }
-          },
-          error: (error) => {
-            console.error("Erreur lors de la création de l'étudiant:", error);
-
-            if (error.status === 401) {
-              alert("Vous n'êtes pas autorisé à effectuer cette action. Veuillez vous reconnecter.");
-            } else if (error.error && error.error.message) {
-              // Analyse détaillée de l'erreur
-              const errorMessage = error.error.message;
-
-              alert("Erreur lors de la création de l'étudiant: " + errorMessage);
-              console.log("Format de date envoyé:", dateNaissance);
-            } else {
-              alert("Erreur lors de la création de l'étudiant: " +
-                (error.message || "Erreur inconnue"));
-            }
-          }
-        });
-      } catch (error: any) {
-        console.error("Erreur lors de la préparation des données:", error);
-        alert("Erreur lors de la préparation des données: " + (error.message || "Erreur inconnue"));
+      if (this.isEditMode) {
+        this.updateStudent();
+      } else {
+        this.addStudent();
       }
     } else {
       // Afficher les champs invalides
@@ -156,19 +153,129 @@ export class StudentCreateComponent implements OnInit {
     }
   }
 
-  // Méthode pour formater la date selon les besoins du backend
+  addStudent(): void {
+    try {
+      const dateNaissanceInput = this.FormEleve.value.dateNaissance;
+      const dateNaissance = this.formatDateForBackend(dateNaissanceInput);
+      const dateInscription = this.formatDateForBackend(new Date().toISOString().split('T')[0]);
+
+      // Création de l'objet EtudiantRequest
+      const newEtudiant: EtudiantRequest = {
+        nom: this.FormEleve.value.nom,
+        prenom: this.FormEleve.value.prenom,
+        email: this.FormEleve.value.email,
+        username: this.FormEleve.value.username,
+        password: this.FormEleve.value.password,
+        telephone: this.FormEleve.value.telephone || "",
+        dateNaissance: dateNaissance,
+        adresse: this.FormEleve.value.adresse || "",
+        sexe: this.FormEleve.value.sexe,
+        role: Role.ETUDIANT,
+        numeroEtudiant: this.FormEleve.value.numeroEtudiant,
+        filiere: this.FormEleve.value.filiere || "",
+        classeId: Number(this.FormEleve.value.classeId),
+        niveauId: Number(this.FormEleve.value.niveauId),
+        dateInscription: dateInscription,
+        anneeScolaire: this.anneeScolaireCourante,
+        photo: ""
+      };
+
+      this.etudiantService.createEtudiant(newEtudiant).subscribe({
+        next: (response) => {
+          if (response.success) {
+            alert("Étudiant créé avec succès!");
+            this.resetForm();
+            this.studentCreated.emit();
+          } else {
+            alert("Erreur lors de la création de l'étudiant: " + response.message);
+          }
+        },
+        error: (error) => {
+          console.error("Erreur lors de la création de l'étudiant:", error);
+          alert("Erreur lors de la création de l'étudiant: " + (error.message || "Erreur inconnue"));
+        }
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la préparation des données:", error);
+      alert("Erreur lors de la préparation des données: " + (error.message || "Erreur inconnue"));
+    }
+  }
+
+  updateStudent(): void {
+    if (!this.etudiantToEdit) return;
+
+    try {
+      const dateNaissanceInput = this.FormEleve.value.dateNaissance;
+      const dateNaissance = this.formatDateForBackend(dateNaissanceInput);
+
+      // Création de l'objet EtudiantRequest pour la mise à jour
+      const updatedEtudiant: EtudiantRequest = {
+        nom: this.FormEleve.value.nom,
+        prenom: this.FormEleve.value.prenom,
+        email: this.FormEleve.value.email,
+        username: this.FormEleve.value.username,
+        // Inclure le mot de passe seulement s'il a été modifié
+        password: this.FormEleve.value.password || undefined,
+        telephone: this.FormEleve.value.telephone || "",
+        dateNaissance: dateNaissance,
+        adresse: this.FormEleve.value.adresse || "",
+        sexe: this.FormEleve.value.sexe,
+        role: Role.ETUDIANT,
+        numeroEtudiant: this.FormEleve.value.numeroEtudiant,
+        filiere: this.FormEleve.value.filiere || "",
+        classeId: Number(this.FormEleve.value.classeId),
+        niveauId: Number(this.FormEleve.value.niveauId),
+        // Conserver les valeurs existantes pour ces champs
+        dateInscription: this.etudiantToEdit.dateInscription,
+        anneeScolaire: this.etudiantToEdit.anneeScolaire || this.anneeScolaireCourante,
+        photo: ""
+      };
+
+      this.etudiantService.updateEtudiant(this.etudiantToEdit.id, updatedEtudiant).subscribe({
+        next: (response) => {
+          if (response.success) {
+            alert("Étudiant mis à jour avec succès!");
+            this.resetForm();
+            this.isEditMode = false;
+            this.studentUpdated.emit();
+          } else {
+            alert("Erreur lors de la mise à jour de l'étudiant: " + response.message);
+          }
+        },
+        error: (error) => {
+          console.error("Erreur lors de la mise à jour de l'étudiant:", error);
+          alert("Erreur lors de la mise à jour de l'étudiant: " + (error.message || "Erreur inconnue"));
+        }
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la préparation des données:", error);
+      alert("Erreur lors de la préparation des données: " + (error.message || "Erreur inconnue"));
+    }
+  }
+
   private formatDateForBackend(dateString: string): string {
-    // Convertir de YYYY-MM-DD à dd/MM/yyyy
+    if (!dateString) return '';
+
     const parts = dateString.split('-');
     if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      if (parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      } else {
+        return dateString;
+      }
     }
-    return dateString; // Retourner tel quel si le format ne correspond pas
+    return dateString;
   }
 
   resetForm() {
     this.FormEleve.reset();
     this.initForm();
+  }
+
+  cancelEdit(): void {
+    this.isEditMode = false;
+    this.etudiantToEdit = null;
+    this.resetForm();
   }
 
   onClasseChange(event: any) {

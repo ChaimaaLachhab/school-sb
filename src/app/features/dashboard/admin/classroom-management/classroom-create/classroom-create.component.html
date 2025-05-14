@@ -1,7 +1,8 @@
+<!-- classroom-create.component.html -->
 <div class="container">
-  <h1>Ajouter une Classe</h1>
+  <h1>{{ isEditMode ? 'Modifier la Classe' : 'Ajouter une Classe' }}</h1>
 
-  <form [formGroup]="formClasse" (ngSubmit)="insert()">
+  <form [formGroup]="formClasse" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="nom">Nom de la Classe:</label>
       <input
@@ -55,8 +56,21 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary" [disabled]="formClasse.invalid">Ajouter</button>
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="formClasse.invalid">
+        {{ isEditMode ? 'Mettre à jour' : 'Ajouter' }}
+      </button>
+
+      <button
+        *ngIf="isEditMode"
+        type="button"
+        class="btn-secondary"
+        (click)="cancelEdit()">
+        Annuler
+      </button>
     </div>
   </form>
 </div>
